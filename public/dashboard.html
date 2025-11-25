@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard - API Usuarios</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+<header class="menu">
+  <h2>Dashboard</h2>
+  <button class="btn" id="logout">Cerrar sesión</button>
+</header>
+
+<div class="card">
+  <h3>Listado de Usuarios</h3>
+
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Email</th>
+        <th>Rol</th>
+        <th>Edad</th>
+        <th>Activo</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody id="tablaUsuarios"></tbody>
+  </table>
+</div>
+
+<!-- SOLO ADMIN -->
+<div class="card" id="seccionCrear" style="display:none;">
+  <h3>Crear Usuario</h3>
+
+  <form id="formCrear">
+    <label>Nombre</label>
+    <input type="text" name="nombre" required>
+
+    <label>Email</label>
+    <input type="email" name="email" required>
+
+    <label>Password</label>
+    <input type="password" name="password" required>
+
+    <label>Rol</label>
+    <select name="rol">
+      <option value="Admin">Admin</option>
+      <option value="Usuario">Usuario</option>
+    </select>
+
+    <label>Edad</label>
+    <input type="number" name="edad" required>
+
+    <label>Activo</label>
+    <select name="activo">
+      <option value="true">Sí</option>
+      <option value="false">No</option>
+    </select>
+
+    <button class="btn" type="submit">Crear</button>
+  </form>
+
+  <p id="msgCrear" class="msg"></p>
+</div>
+
+
+<script>
+// =============================
+// VALIDAR SESIÓN
+// =============================
+const accessToken = localStorage.getItem("accessToken");
+const refreshToken = localStorage.getItem("refreshToken");
+const rol = localStorage.getItem("rol");
+
+if (!accessToken) {
+  window.location.href = "login.html";
+}
+
+// Mostrar crear solo para Admin
+if (rol === "Admin") {
+  document.getElementById("seccionCrear").style.display = "block";
+}
+
+
+// =============================
+// FUNCIONES DE API
+// =============================
+
+// Cargar listado
+async function cargarUsuarios() {
+  const res = await fetch("/usuarios", {
+    headers: { "Authorization": "Bearer " + accessToken }
+  });
+
+  if (res.status === 403) {
+    alert("Sesión expirada. Inicia sesión nuevamente.");
+    localStorage.clear();
+    window.location.href = "login.html";
+    return;
+  }
+
+  const data = await res.json();
+  const tbody = document.getElementById("tablaUsuarios");
+  tbody.innerHTML = "";
+
+  data.data.forEach(u => {
+    tbody.innerHTML += `
+    <tr>
+      <td>${u.id}</td>
+      <td>${u.nombre}</td>
+      <td>${u.email}</td>
+      <td>${u.rol}</td>
+      <td>${u.edad}</td>
+      <td>${u.activo}</td>
+      <td>
+        <button class="btn" onclick="editar(${u.id})">✏ Editar</button>
+        <button class="btn btn-danger" onclick="eliminar(${u.id})">🗑 Eliminar</button>
+      </td>
+    </tr>
+    `;
+  });
+}
+
+
+// =============================
+// ACCIÓN: Editar
+// =============================
+function editar(id) {
+  window.location.href = "editar.html?id=" + id;
+}
+
+
+// =============================
+// ACCIÓN: Eliminar
+// =============================
+async function eliminar(id) {
+  if (!confirm("¿Seguro que deseas eliminar este usuario?")) return;
+
+  const res = await fetch(`/usuarios/${id}`, {
+    method: "DELETE",
+    headers: { "Authorization": "Bearer " + accessToken }
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    alert("Error: " + JSON.stringify(data));
+    return;
+  }
+
+  alert("Usuario eliminado");
+  cargarUsuarios();
+}
+
+
+// =============================
+// ACCIÓN: Crear usuario
+// =============================
+document.getElementById("formCrear")?.addEventListener("submit", async e => {
+  e.preventDefault();
+
+  const body = Object.fromEntries(new FormData(e.target));
+  body.edad = parseInt(body.edad);
+  body.activo = body.activo === "true";
+
+  const res = await fetch("/usuarios", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + accessToken
+    },
+    body: JSON.stringify(body)
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    document.getElementById("msgCrear").textContent = JSON.stringify(data);
+    document.getElementById("msgCrear").className = "msg error";
+    return;
+  }
+
+  document.getElementById("msgCrear").textContent = "Usuario creado correctamente";
+  document.getElementById("msgCrear").className = "msg ok";
+
+  e.target.reset();
+  cargarUsuarios();
+});
+
+
+// =============================
+// CERRAR SESIÓN
+// =============================
+document.getElementById("logout").onclick = () => {
+  localStorage.clear();
+  window.location.href = "login.html";
+};
+
+
+// Inicializar
+cargarUsuarios();
+</script>
+
+</body>
+</html>

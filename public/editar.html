@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Editar Usuario</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+  <h2>Editar usuario</h2>
+
+  <form id="formEditar">
+    <label>ID:
+      <input type="number" id="id" readonly>
+    </label>
+
+    <label>Nombre:
+      <input type="text" id="nombre" required>
+    </label>
+
+    <label>Email:
+      <input type="email" id="email" required>
+    </label>
+
+    <label>Rol:
+      <select id="rol">
+        <option value="Admin">Admin</option>
+        <option value="Usuario">Usuario</option>
+      </select>
+    </label>
+
+    <label>Edad:
+      <input type="number" id="edad" required>
+    </label>
+
+    <label>Activo:
+      <select id="activo">
+        <option value="true">true</option>
+        <option value="false">false</option>
+      </select>
+    </label>
+
+    <button type="submit">Guardar cambios</button>
+  </form>
+
+  <p id="msg"></p>
+
+<script>
+const TOKEN = localStorage.getItem("accessToken");
+
+// Validar sesión
+if (!TOKEN) {
+  alert("Sesión expirada. Inicia sesión de nuevo.");
+  window.location.href = "login.html";
+}
+
+// Obtener ID desde URL
+const params = new URLSearchParams(window.location.search);
+const userId = params.get("id");
+
+document.getElementById("id").value = userId;
+
+// ---- CARGAR DATOS ----
+async function cargarDatos() {
+  const res = await fetch(`/usuarios/${userId}`, {
+    headers: { "Authorization": `Bearer ${TOKEN}` }
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    document.getElementById("msg").textContent = "Error cargando usuario";
+    return;
+  }
+
+  nombre.value = data.nombre;
+  email.value = data.email;
+  rol.value = data.rol;
+  edad.value = data.edad;
+  activo.value = data.activo;
+}
+
+cargarDatos();
+
+
+// ---- GUARDAR CAMBIOS ----
+document.getElementById("formEditar").addEventListener("submit", async e => {
+  e.preventDefault();
+
+  const body = {
+    nombre: nombre.value,
+    email: email.value,
+    rol: rol.value,
+    edad: Number(edad.value),
+    activo: activo.value === "true"
+  };
+
+  const res = await fetch(`/usuarios/${userId}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${TOKEN}`
+    },
+    body: JSON.stringify(body)
+  });
+
+  const data = await res.json();
+
+  if (res.ok) {
+    msg.textContent = "Usuario actualizado correctamente";
+    msg.className = "msg ok";
+  } else {
+    msg.textContent = "Error: " + JSON.stringify(data);
+    msg.className = "msg error";
+  }
+});
+</script>
+
+</body>
+</html>

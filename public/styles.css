@@ -1,0 +1,127 @@
+/* ===== ESTILO GLOBAL ===== */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: "Segoe UI", Roboto, Arial, sans-serif;
+    background: #f7f7f7;
+    color: #333;
+    padding: 20px;
+    line-height: 1.5;
+}
+
+h1, h2 {
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #222;
+}
+
+small {
+    color: #666;
+}
+
+/* ===== SECCIONES ===== */
+section {
+    background: #fff;
+    border: 1px solid #e2e2e2;
+    border-radius: 8px;
+    padding: 18px;
+    margin-top: 20px;
+    box-shadow: 0px 2px 4px rgba(0,0,0,0.04);
+}
+
+label {
+    display: inline-block;
+    margin: 8px 15px 8px 0;
+}
+
+input, select {
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    background-color: #fafafa;
+}
+
+input:focus,
+select:focus {
+    outline: none;
+    border-color: #888;
+    background-color: #fff;
+}
+
+/* ===== BOTONES ===== */
+.btn {
+    background: #333;
+    color: white;
+    border: none;
+    padding: 7px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.2s;
+    font-size: 14px;
+}
+
+.btn:hover {
+    background: #000;
+}
+
+/* ===== TABLAS ===== */
+table {
+    width: 100%;
+    margin-top: 12px;
+    border-collapse: collapse;
+}
+
+th {
+    background: #f0f0f0;
+    padding: 10px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 14px;
+    border-bottom: 2px solid #ddd;
+}
+
+td {
+    border-bottom: 1px solid #e5e5e5;
+    padding: 8px;
+    font-size: 14px;
+}
+
+tr:hover td {
+    background: #f9f9f9;
+}
+
+/* ===== MENSAJES ===== */
+.msg {
+    margin-top: 10px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.msg.ok {
+    background: #e9f7ec;
+    color: #276738;
+    border: 1px solid #b7dfc3;
+}
+
+.msg.error {
+    background: #fdecea;
+    color: #8a1f17;
+    border: 1px solid #f5c2c0;
+}
+
+/* ===== OCULTAR SECCIONES ===== */
+.oculto {
+    display: none;
+}
+
+/* ===== CONTROLES DE PAGINACIÓN ===== */
+#infoPagina {
+    margin: 0 10px;
+    font-weight: 500;
+}

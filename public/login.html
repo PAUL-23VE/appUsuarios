@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Login - API Usuarios</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="center">
+
+  <div class="card auth-card">
+    <h2>Iniciar Sesión</h2>
+
+    <form id="formLogin">
+      <label>Email</label>
+      <input type="email" name="email" required>
+
+      <label>Password</label>
+      <input type="password" name="password" required>
+
+      <button class="btn" type="submit">Ingresar</button>
+    </form>
+
+    <p id="msgLogin" class="msg"></p>
+
+    <p>
+      ¿No tienes una cuenta?
+      <a href="register.html">Crear cuenta</a>
+    </p>
+  </div>
+
+<script>
+document.getElementById("formLogin").addEventListener("submit", async e => {
+  e.preventDefault();
+
+  const body = Object.fromEntries(new FormData(e.target));
+
+  const res = await fetch("/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body)
+  });
+
+  const data = await res.json();
+  const msg = document.getElementById("msgLogin");
+
+  if (!res.ok) {
+    msg.textContent = data.mensaje;
+    msg.className = "msg error";
+    return;
+  }
+
+  // Guardar tokens
+  localStorage.setItem("accessToken", data.accessToken);
+  localStorage.setItem("refreshToken", data.refreshToken);
+  localStorage.setItem("rol", data.rol);
+
+  window.location.href = "dashboard.html";
+});
+</script>
+
+</body>
+</html>
